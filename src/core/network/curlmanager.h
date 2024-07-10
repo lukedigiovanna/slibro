@@ -14,13 +14,10 @@ private:
     CurlManager();
     ~CurlManager();
 
-    size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userData);
-public:
-    typedef std::function<void(const std::string&)> FetchCallback;
-
+  public:
     // delete copy and assignment constructors
     CurlManager(const CurlManager&) = delete;
     CurlManager& operator=(const CurlManager&) = delete;
 
-    void fetch(const std::string& url, const FetchCallback& callback);
+    std::string fetch(const std::string& url);
 };

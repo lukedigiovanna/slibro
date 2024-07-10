@@ -6,13 +6,9 @@
 #include "../core/network/curlmanager.h"
 
 int main(int argc, char *argv[]) {
-    auto myCB = [](const std::string& contents) {
-        std::cout << contents << std::endl;
-    };
+    std::string contents = CurlManager::get().fetch("http://localhost:8000");
 
-    std::cout << &myCB << std::endl;
+    std::cout << contents << std::endl;
 
-    CurlManager::get().fetch("http://localhost:8000", myCB);
-
-    std::cout << "EOP\n";
+    return 0;
 }

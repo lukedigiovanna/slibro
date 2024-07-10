@@ -14,8 +14,8 @@ CurlManager::CurlManager() {
     }
 }
 
-CurlManager::~CurlManager() {
-    std::cout << "cleaning up curl manager\n";
+CurlManager::~CurlManager()
+{
     curl_easy_cleanup(curl);
     curl_global_cleanup();
 }
@@ -30,9 +30,8 @@ struct CurlResult {
     }
 };
 
-size_t cb(void *contents, size_t size, size_t nmemb,
-                                  void *userData) {
-    std::cout << userData << std::endl;
+size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userData)
+{
     size_t realsize = size * nmemb;
     CurlResult* mem = static_cast<CurlResult*>(userData);
     
@@ -47,33 +46,17 @@ size_t cb(void *contents, size_t size, size_t nmemb,
     memcpy(&(mem->memory[mem->size]), contents, realsize);
     mem->size += realsize;
     mem->memory[mem->size] = 0;
-    
+
     return realsize;
-
-    // std::cout << userData << std::endl;
-
-    // CurlResult* result = static_cast<CurlResult*>(userData);
-    // char* res = static_cast<char*>(contents);
-    // result->text = res;
-    
-    // // if (userData == nullptr) {
-    // //     throw std::runtime_error("Callback is not valid");
-    // // }
-    // // FetchCallback *callback = static_cast<FetchCallback *>(userData);
-    // // std::cout << "got callback\n";
-    // // (*callback)("hello");
-    // // std::cout << "past callback\n";
-    // return size * nmemb;
 }
 
-void CurlManager::fetch(const std::string &url, const FetchCallback& callback) {
-    std::cout << &callback << std::endl;
-
+std::string CurlManager::fetch(const std::string& url)
+{
     CurlResult result;
 
     curl_easy_reset(curl);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) &result);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
     
@@ -84,7 +67,7 @@ void CurlManager::fetch(const std::string &url, const FetchCallback& callback) {
                 curl_easy_strerror(res));
     }
 
-    std::cout << result.memory << std::endl;
+    return result.memory;
 }
 
 CurlManager &CurlManager::get() {
